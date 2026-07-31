@@ -104,7 +104,7 @@ export default function ImpactMetrics() {
                 alt="A single plot progressing from bare earth to mature trees"
                 fill
                 sizes="(max-width: 1024px) 90vw, 480px"
-                className="object-contain"
+                className="object-cover"
               />
             </div>
 

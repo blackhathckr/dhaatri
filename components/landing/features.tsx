@@ -23,7 +23,6 @@ const MODULES = [
     body: "A backyard, a rooftop, a community plot or institutional land — registered with its geo-location, then assessed on the ground before anything is planted.",
     points: ["Geo-tagged at registration", "Volunteer site assessment", "Soil, sunlight and water captured"],
     art: "/features/registration.png",
-    tint: "bg-pale",
   },
   {
     n: "02",
@@ -32,7 +31,6 @@ const MODULES = [
     body: "A scientist-owned, versioned methodology computes CO₂ from species, growth stage and verified survival — so every published figure traces back to how it was produced.",
     points: ["Versioned computation engine", "Survival-weighted, never notional", "Traceable to site and method"],
     art: "/features/carbon-engine.png",
-    tint: "bg-[#D9EAF3]",
   },
   {
     n: "03",
@@ -41,7 +39,6 @@ const MODULES = [
     body: "Photo check-ins record how many trees are alive, where and when. Offline-capable for patchy connectivity, syncing the moment a signal returns.",
     points: ["Photo + location on every visit", "Survival tracked over time", "Offline-first field capture"],
     art: "/features/monitoring.png",
-    tint: "bg-[#FAEDCD]",
   },
   {
     n: "04",
@@ -50,7 +47,6 @@ const MODULES = [
     body: "A small, verified supplier set with live inventory visibility. Orders route automatically from an approved plan, and dispatch through delivery is tracked end to end.",
     points: ["Live stock visibility", "Automatic order routing", "Dispatch and delivery tracking"],
     art: "/features/supply.png",
-    tint: "bg-mint/40",
   },
   {
     n: "05",
@@ -59,7 +55,6 @@ const MODULES = [
     body: "Organisations purchase methodology-backed units and receive digital certificates — with live monitoring of the specific plantations backing each credit.",
     points: ["1 unit = 1 tonne CO₂e", "Digital certificates on purchase", "Live view of backing sites"],
     art: "/features/credits.png",
-    tint: "bg-[#FBDDD2]",
   },
 ];
 
@@ -108,15 +103,17 @@ export default function Features() {
               >
                 {/* artwork */}
                 <div className={flip ? "lg:order-2" : ""}>
+                  {/* Full-bleed and cropped, not contained on a tinted ground —
+                      these are scenes, and a scene needs an edge to run to. */}
                   <div
-                    className={`relative aspect-square w-full max-w-[380px] overflow-hidden rounded-[24px] p-6 ${flip ? "lg:ml-auto" : ""} ${m.tint}`}
+                    className={`relative aspect-[4/3] w-full max-w-[500px] overflow-hidden rounded-[24px] bg-pale ${flip ? "lg:ml-auto" : ""}`}
                   >
                     <Image
                       src={m.art}
                       alt=""
                       fill
-                      sizes="(max-width: 1024px) 90vw, 380px"
-                      className="object-contain p-2 transition-transform duration-[900ms] ease-out group-hover:scale-[1.03]"
+                      sizes="(max-width: 1024px) 90vw, 500px"
+                      className="object-cover transition-transform duration-[1200ms] ease-out group-hover:scale-[1.04]"
                     />
                   </div>
                 </div>
