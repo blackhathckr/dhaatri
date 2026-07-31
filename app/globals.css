@@ -1,0 +1,229 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* ── Dhaatri Design Tokens ──────────────────────────────── */
+
+:root {
+  --background: #F5F1EB;
+  --foreground: #1B4332;
+  --card: #FFFFFF;
+  --card-foreground: #1B4332;
+  --popover: #FFFFFF;
+  --popover-foreground: #1B4332;
+  --primary: #2D6A4F;
+  --primary-foreground: #FFFFFF;
+  --secondary: #E9EDC9;
+  --secondary-foreground: #1B4332;
+  --muted: #E9EDC9;
+  --muted-foreground: #6B7F75;
+  --accent: #D8F3DC;
+  --accent-foreground: #1B4332;
+  --destructive: #C1414A;
+  --destructive-foreground: #FFFFFF;
+  --border: #E0DDD6;
+  --input: #E0DDD6;
+  --ring: #2D6A4F;
+  --radius: 0.75rem;
+
+  --chart-1: #2D6A4F;
+  --chart-2: #52B788;
+  --chart-3: #D4A373;
+  --chart-4: #74C69D;
+  --chart-5: #8B5E3C;
+
+  --sidebar: #1B4332;
+  --sidebar-foreground: #D8F3DC;
+  --sidebar-primary: #52B788;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #2D6A4F;
+  --sidebar-accent-foreground: #D8F3DC;
+  --sidebar-border: #2D6A4F;
+  --sidebar-ring: #52B788;
+
+  /* ── App surfaces ─────────────────────────────────────────
+     The product screens are built from a handful of surfaces and four ink
+     weights. Naming them is what lets the whole app flip to dark mode without
+     every screen hard-coding a hex that only works on cream. */
+  --surface: #FFFFFF;      /* cards, panels, table bodies */
+  --surface-2: #FAF8F5;    /* row hover */
+  --surface-3: #F3F6F0;    /* tinted inset blocks, inputs */
+  --track: #EBE6DE;        /* progress and bar backgrounds */
+  --line: #EBE6DE;         /* card borders */
+  --line-soft: #F0ECE5;    /* dividers inside a card */
+  --ink-strong: #1B4332;   /* headings, figures */
+  --ink-soft: #6B7F75;     /* body copy */
+  --ink-faint: #9AA39C;    /* labels, meta */
+  --ink-ghost: #C4C0B7;    /* timestamps, disabled */
+  --ink-brand: #2D6A4F;    /* links and brand-coloured text */
+}
+
+.dark {
+  --background: #0D2818;
+  --foreground: #D8F3DC;
+  --card: #1B4332;
+  --card-foreground: #D8F3DC;
+  --popover: #1B4332;
+  --popover-foreground: #D8F3DC;
+  --primary: #52B788;
+  --primary-foreground: #1B4332;
+  --secondary: #2D6A4F;
+  --secondary-foreground: #D8F3DC;
+  --muted: #2D6A4F;
+  --muted-foreground: #95D5B2;
+  --accent: #2D6A4F;
+  --accent-foreground: #D8F3DC;
+  --destructive: #C1414A;
+  --destructive-foreground: #FFFFFF;
+  --border: #2D6A4F;
+  --input: #2D6A4F;
+  --ring: #52B788;
+
+  --chart-1: #52B788;
+  --chart-2: #74C69D;
+  --chart-3: #D4A373;
+  --chart-4: #95D5B2;
+  --chart-5: #CCD5AE;
+
+  --sidebar: #0A1F13;
+  --sidebar-foreground: #D8F3DC;
+  --sidebar-primary: #52B788;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #1B4332;
+  --sidebar-accent-foreground: #D8F3DC;
+  --sidebar-border: #1B4332;
+  --sidebar-ring: #52B788;
+
+  /* Forest-black, not grey — the dark theme stays the same brand. */
+  --surface: #16301F;
+  --surface-2: #12291A;
+  --surface-3: #1B3A27;
+  --track: #24452F;
+  --line: #24452F;
+  --line-soft: #1F3B29;
+  --ink-strong: #E7F4EC;
+  --ink-soft: #A9C4B4;
+  --ink-faint: #7E9A8A;
+  --ink-ghost: #5E7A6A;
+  --ink-brand: #74C69D;
+}
+
+/* ── Tailwind v4 Theme ──────────────────────────────────── */
+
+@theme inline {
+  /* Marketing display pair — Onest for headlines, Playfair italic for the
+     accent word inside them. Brand greens mirror the mobile token set. */
+  --font-onest: var(--font-onest), ui-sans-serif, system-ui, sans-serif;
+  --font-playfair: var(--font-playfair), ui-serif, Georgia, serif;
+  --color-forest: #1b4332;
+  --color-emerald: #2d6a4f;
+  --color-fresh: #52b788;
+  --color-sage: #74c69d;
+  --color-mint: #95d5b2;
+  --color-pale: #d8f3dc;
+  --color-cream: #f5f1eb;
+  --color-ink: #042718;
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+
+  /* App surfaces — generate bg-surface, border-line, text-ink-soft, … */
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
+  --color-track: var(--track);
+  --color-line: var(--line);
+  --color-line-soft: var(--line-soft);
+  --color-ink-strong: var(--ink-strong);
+  --color-ink-soft: var(--ink-soft);
+  --color-ink-faint: var(--ink-faint);
+  --color-ink-ghost: var(--ink-ghost);
+  --color-ink-brand: var(--ink-brand);
+
+  /* Dhaatri brand colors */
+  --color-forest: #1B4332;
+  --color-emerald-brand: #2D6A4F;
+  --color-fresh: #52B788;
+  --color-sage: #74C69D;
+  --color-mint: #95D5B2;
+  --color-pale: #B7E4C7;
+  --color-mist: #D8F3DC;
+  --color-frost: #E9F5EE;
+  --color-cream: #F5F1EB;
+  --color-linen: #E8E3DB;
+  --color-stone-brand: #E0DDD6;
+  --color-drift: #6B7F75;
+  --color-earth: #D4A373;
+  --color-soil: #8B5E3C;
+  --color-sand: #FAEDCD;
+  --color-olive: #CCD5AE;
+  --color-soft-sage: #E9EDC9;
+
+  --font-sans: var(--font-plus-jakarta), system-ui, sans-serif;
+  --font-heading: var(--font-plus-jakarta), system-ui, sans-serif;
+
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.25rem;
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+/* ── Base ───────────────────────────────────────────────── */
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* ── Accessibility ──────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
