@@ -66,7 +66,10 @@ export default function RootLayout({
       {/* Providers sit at the root so signing in on /login carries into the app
           shell, and so the workflow store survives navigation between the
           marketing site and the product. A reload restores the seed data. */}
-      <body className="min-h-full flex flex-col font-sans">
+      {/* Extensions (ColorZilla, Grammarly, password managers) inject
+          attributes onto <body> before React hydrates, which React reports
+          as a mismatch. Nothing we render differs between server and client. */}
+      <body className="min-h-full flex flex-col font-sans" suppressHydrationWarning>
         <ThemeProvider>
           <StoreProvider>
             <AuthProvider>{children}</AuthProvider>
