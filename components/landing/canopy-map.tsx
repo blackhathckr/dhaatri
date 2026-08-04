@@ -70,7 +70,7 @@ function TileLayer({ box, zoom }: { box: Box; zoom: number }) {
         // eslint-disable-next-line @next/next/no-img-element
         <img
           key={`${t.x}-${t.y}`}
-          src={`https://a.basemaps.cartocdn.com/dark_all/${zoom}/${t.x}/${t.y}@2x.png`}
+          src={`https://a.basemaps.cartocdn.com/light_all/${zoom}/${t.x}/${t.y}@2x.png`}
           alt=""
           loading="lazy"
           style={{
@@ -82,9 +82,8 @@ function TileLayer({ box, zoom }: { box: Box; zoom: number }) {
           }}
         />
       ))}
-      {/* tint toward forest, but keep the streets legible underneath */}
-      <div className="absolute inset-0 bg-[#0A1F13] mix-blend-color opacity-70" />
-      <div className="absolute inset-0 bg-[#0A1F13]/15" />
+      {/* a whisper of warmth so the grey basemap sits on cream, nothing more */}
+      <div className="absolute inset-0 bg-[#F5F1EB] mix-blend-multiply opacity-25" />
     </div>
   );
 }
@@ -178,7 +177,7 @@ const project = (lat: number, lng: number, box: Box) => ({
 function CanopyOverlay({
   cells,
   detail,
-  strength = 0.34,
+  strength = 0.62,
   hovered,
   onHover,
 }: {
@@ -198,18 +197,18 @@ function CanopyOverlay({
       preserveAspectRatio="none"
       className="absolute inset-0 size-full"
     >
-      <g style={{ mixBlendMode: "screen" }}>
+      <g style={{ mixBlendMode: "multiply" }}>
         {cells.map((c, i) => (
           <motion.rect
             key={`${c.x}-${c.y}`}
             x={c.x * cw}
             y={c.y * ch}
-            width={cw * 0.84}
-            height={ch * 0.84}
+            width={cw * 0.92}
+            height={ch * 0.92}
             rx={0.5}
             fill={shade(c.v)}
             initial={{ opacity: 0 }}
-            animate={{ opacity: hovered === c ? strength * 1.9 : strength }}
+            animate={{ opacity: hovered === c ? 1 : strength }}
             transition={{ duration: 0.5, delay: detail ? (i % COLS) * 0.004 : 0 }}
             onMouseEnter={detail ? () => onHover?.(c) : undefined}
             onMouseLeave={detail ? () => onHover?.(null) : undefined}
@@ -223,16 +222,16 @@ function CanopyOverlay({
         const p = project(s.latitude, s.longitude, CITY);
         return (
           <g key={s.id}>
-            <circle cx={p.x} cy={p.y} r="2.4" fill="#FFFFFF" opacity="0.25">
+            <circle cx={p.x} cy={p.y} r="2.4" fill="#12362A" opacity="0.28">
               <animate attributeName="r" values="2;4.4;2" dur="3s" repeatCount="indefinite" />
             </circle>
             <circle
               cx={p.x}
               cy={p.y}
               r={detail ? 1.1 : 1.5}
-              fill="#FFFFFF"
-              stroke="#0A1F13"
-              strokeWidth="0.4"
+              fill="#12362A"
+              stroke="#FFFFFF"
+              strokeWidth="0.5"
             />
           </g>
         );
@@ -254,8 +253,8 @@ function PilotFrame() {
         height={b.y - a.y}
         rx="0.6"
         fill="#52B788"
-        fillOpacity="0.18"
-        stroke="#95D5B2"
+        fillOpacity="0.22"
+        stroke="#1B4332"
         strokeWidth="0.45"
         initial={{ opacity: 0, scale: 1.4 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -270,7 +269,8 @@ function PilotFrame() {
         x={(a.x + b.x) / 2}
         y={a.y - 2}
         textAnchor="middle"
-        style={{ fontSize: 2.6, fill: "#D8F3DC", fontWeight: 600, letterSpacing: 0.1 }}
+        style={{ fontSize: 2.6, fill: "#12362A", fontWeight: 700, letterSpacing: 0.1,
+          paintOrder: "stroke", stroke: "#FFFFFF", strokeWidth: 0.8 }}
       >
         Pilot locality
       </text>
@@ -300,7 +300,7 @@ function FullMap() {
   return (
     <div className="flex flex-col gap-4 lg:flex-row">
       <div className="relative min-w-0 flex-1">
-        <div className="relative aspect-[30/26] w-full overflow-hidden rounded-2xl bg-[#0A1F13] ring-1 ring-white/10">
+        <div className="relative aspect-[30/26] w-full overflow-hidden rounded-2xl bg-[#EAE7E0] ring-1 ring-ink-strong/10">
           {view === "city" ? (
             <>
               <TileLayer box={CITY} zoom={ZOOM.city} />
@@ -352,7 +352,7 @@ function FullMap() {
             </div>
           )}
 
-          <p className="pointer-events-none absolute bottom-2.5 right-4 text-[9px] text-white/35">
+          <p className="pointer-events-none absolute bottom-2.5 right-4 text-[9px] text-ink-strong/40">
             © OpenStreetMap contributors · © CARTO
           </p>
         </div>
@@ -404,7 +404,7 @@ function FullMap() {
               </span>
             ))}
             <span className="flex items-center gap-2.5 pt-1 text-[12px] text-ink-soft">
-              <span className="size-3 rounded-full border border-[#12362A] bg-white" />
+              <span className="size-3 rounded-full border-2 border-white bg-[#12362A] ring-1 ring-[#12362A]/30" />
               Registered Dhaatri plot
             </span>
           </div>
@@ -443,11 +443,11 @@ export function CanopyFab() {
       >
         <button
           onClick={() => setOpen(true)}
-          className="group relative block size-[200px] overflow-hidden rounded-[22px] bg-[#0A1F13] text-left shadow-[0_20px_50px_-16px_rgba(4,39,24,0.65)] ring-1 ring-white/12 transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_30px_64px_-18px_rgba(4,39,24,0.75)] sm:size-[248px]"
+          className="group relative block size-[200px] overflow-hidden rounded-[22px] bg-[#EAE7E0] text-left shadow-[0_20px_50px_-16px_rgba(4,39,24,0.65)] ring-1 ring-white/12 transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_30px_64px_-18px_rgba(4,39,24,0.75)] sm:size-[248px]"
         >
           <div className="absolute inset-0 transition-transform duration-[1400ms] ease-out group-hover:scale-[1.07]">
             <TileLayer box={CITY} zoom={ZOOM.city} />
-            <CanopyOverlay cells={cells} detail={false} strength={0.46} />
+            <CanopyOverlay cells={cells} detail={false} strength={0.7} />
           </div>
           <div className="absolute inset-0 bg-gradient-to-t from-[#0A1F13] via-[#0A1F13]/45 to-transparent" />
 
