@@ -133,20 +133,8 @@ function canopyAt(lat: number, lng: number) {
   return Math.max(0, Math.min(1, 0.4 + green * 0.42 - built * 0.34));
 }
 
-/** Seven steps from dense canopy to bare ground. */
-function shade(v: number) {
-  if (v >= 0.66) return "#1FA36B";
-  if (v >= 0.56) return "#2D6A4F";
-  if (v >= 0.47) return "#52B788";
-  if (v >= 0.39) return "#7FC79B";
-  if (v >= 0.32) return "#C9B87A";
-  if (v >= 0.25) return "#E0A05C";
-  if (v >= 0.18) return "#D9704A";
-  return "#C1414A";
-}
-
-const COLS = 30;
-const ROWS = 26;
+const COLS = 46;
+const ROWS = 40;
 
 type Cell = { x: number; y: number; v: number; lat: number; lng: number };
 
@@ -174,22 +162,48 @@ const project = (lat: number, lng: number, box: Box) => ({
 
 /* ═══════════════════════════════════════════════ overlays ══════════════ */
 
+/**
+ * The coverage layer, drawn the way a real coverage map draws one: solid
+ * organic regions, not a grid of squares.
+ *
+ * Each sample becomes a soft circle, and the whole group runs through a
+ * gooey filter — a heavy blur followed by an alpha ramp — which fuses
+ * overlapping circles into single blobs with clean edges. Green marks canopy
+ * the city has; coral marks where it doesn't.
+ */
 function CanopyOverlay({
   cells,
   detail,
-  strength = 0.62,
+  strength = 0.5,
   hovered,
   onHover,
 }: {
   cells: Cell[];
   detail: boolean;
-  /** Kept low on purpose — the streets underneath are half the point. */
+  /** The streets underneath are half the point, so this never reaches 1. */
   strength?: number;
   hovered?: Cell | null;
   onHover?: (c: Cell | null) => void;
 }) {
   const cw = 100 / COLS;
   const ch = 100 / ROWS;
+  const uid = React.useId().replace(/:/g, "");
+
+  // Two fields rather than a seven-step ramp — "has canopy" and "doesn't"
+  // reads instantly; a rainbow of bands does not. The thresholds nearly meet,
+  // so the layer covers the city continuously with only a thin seam between
+  // them, the way a real coverage map does.
+  const green = cells.filter((c) => c.v >= 0.45);
+  const bare = cells.filter((c) => c.v <= 0.42);
+
+  const blob = (c: Cell, weight: number) => (
+    <circle
+      key={`${c.x}-${c.y}`}
+      cx={c.x * cw + cw / 2}
+      cy={c.y * ch + ch / 2}
+      r={Math.max(cw, ch) * (0.72 + weight * 0.5)}
+    />
+  );
 
   return (
     <svg
@@ -197,42 +211,80 @@ function CanopyOverlay({
       preserveAspectRatio="none"
       className="absolute inset-0 size-full"
     >
-      <g style={{ mixBlendMode: "multiply" }}>
-        {cells.map((c, i) => (
-          <motion.rect
-            key={`${c.x}-${c.y}`}
-            x={c.x * cw}
-            y={c.y * ch}
-            width={cw * 0.92}
-            height={ch * 0.92}
-            rx={0.5}
-            fill={shade(c.v)}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: hovered === c ? 1 : strength }}
-            transition={{ duration: 0.5, delay: detail ? (i % COLS) * 0.004 : 0 }}
-            onMouseEnter={detail ? () => onHover?.(c) : undefined}
-            onMouseLeave={detail ? () => onHover?.(null) : undefined}
-            className={detail ? "cursor-crosshair" : undefined}
+      <defs>
+        {/* blur, then crush the alpha back to near-binary — overlapping
+            circles fuse into one organic shape with a crisp edge */}
+        <filter id={`goo-${uid}`}>
+          <feGaussianBlur in="SourceGraphic" stdDeviation="1.9" result="b" />
+          <feColorMatrix
+            in="b"
+            type="matrix"
+            values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 16 -6"
           />
-        ))}
+        </filter>
+      </defs>
+
+      <g style={{ mixBlendMode: "multiply" }}>
+        <motion.g
+          fill="#2E9E6B"
+          filter={`url(#goo-${uid})`}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: strength }}
+          transition={{ duration: 0.9, ease: [0.21, 0.47, 0.32, 0.98] }}
+        >
+          {green.map((c) => blob(c, (c.v - 0.45) / 0.55))}
+        </motion.g>
+
+        <motion.g
+          fill="#E4593F"
+          filter={`url(#goo-${uid})`}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: strength * 1.05 }}
+          transition={{ duration: 0.9, delay: 0.15, ease: [0.21, 0.47, 0.32, 0.98] }}
+        >
+          {bare.map((c) => blob(c, (0.42 - c.v) / 0.42))}
+        </motion.g>
       </g>
 
-      {/* Dhaatri plots — the only measured data on the plate */}
+      {/* invisible probe grid — hovering reads the field, not the blobs */}
+      {detail &&
+        cells.map((c) => (
+          <rect
+            key={`p-${c.x}-${c.y}`}
+            x={c.x * cw}
+            y={c.y * ch}
+            width={cw}
+            height={ch}
+            fill="transparent"
+            onMouseEnter={() => onHover?.(c)}
+            onMouseLeave={() => onHover?.(null)}
+            className="cursor-crosshair"
+          />
+        ))}
+
+      {/* the cursor cell, called out the way the reference calls out a pin */}
+      {detail && hovered && (
+        <circle
+          cx={hovered.x * cw + cw / 2}
+          cy={hovered.y * ch + ch / 2}
+          r="1.4"
+          fill="none"
+          stroke="#12362A"
+          strokeWidth="0.45"
+        />
+      )}
+
+      {/* Dhaatri plots — white ring, dark core, exactly like a coverage pin */}
       {MOCK_SITES.map((s) => {
         const p = project(s.latitude, s.longitude, CITY);
         return (
           <g key={s.id}>
-            <circle cx={p.x} cy={p.y} r="2.4" fill="#12362A" opacity="0.28">
-              <animate attributeName="r" values="2;4.4;2" dur="3s" repeatCount="indefinite" />
+            <circle cx={p.x} cy={p.y} r="2.9" fill="#FFFFFF" opacity="0.55">
+              <animate attributeName="r" values="2.6;4.6;2.6" dur="3.2s" repeatCount="indefinite" />
+              <animate attributeName="opacity" values="0.55;0;0.55" dur="3.2s" repeatCount="indefinite" />
             </circle>
-            <circle
-              cx={p.x}
-              cy={p.y}
-              r={detail ? 1.1 : 1.5}
-              fill="#12362A"
-              stroke="#FFFFFF"
-              strokeWidth="0.5"
-            />
+            <circle cx={p.x} cy={p.y} r={detail ? 2 : 2.4} fill="#FFFFFF" />
+            <circle cx={p.x} cy={p.y} r={detail ? 1.05 : 1.3} fill="#12362A" />
           </g>
         );
       })}
@@ -281,11 +333,8 @@ function PilotFrame() {
 /* ═══════════════════════════════════════════════ the full map ══════════ */
 
 const LEGEND = [
-  { c: "#1FA36B", l: "Dense canopy" },
-  { c: "#52B788", l: "Healthy" },
-  { c: "#C9B87A", l: "Thin" },
-  { c: "#E0A05C", l: "Sparse" },
-  { c: "#C1414A", l: "Bare" },
+  { c: "#2E9E6B", l: "Canopy the city has" },
+  { c: "#E4593F", l: "Bare — nothing to lose" },
 ];
 
 function FullMap() {
